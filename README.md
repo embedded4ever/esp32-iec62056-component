@@ -102,3 +102,5 @@ For examle above `export_obis_code`
 
 When the reading from the meter is finished. All values are placed in the export_hdl variable. If you want to access the value of 32.7.0.
 `export_hdl -> export_holder[0]` It holds this value.
+
+![](resources/Animation.gif)
