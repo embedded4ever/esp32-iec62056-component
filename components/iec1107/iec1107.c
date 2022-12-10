@@ -1,8 +1,9 @@
 #include <string.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/event_groups.h"
-#include "esp_log.h"
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+#include <freertos/event_groups.h>
+#include <esp_log.h>
+#include <freertos/timers.h>
 #include "iec1107.h"
 #include "config.h"
 
@@ -22,6 +23,9 @@
 ESP_EVENT_DEFINE_BASE(IEC1107_EVENT);
 
 static const char *IEC1107_TAG = "iec1107_parser";
+
+/* @brief Software Timer to reading meter */
+static TimerHandle_t iec1107_cycle_timer = NULL;
 
 /* @brief FreeRTOS event group to signal when we need to make a start & readout request */
 static EventGroupHandle_t s_iec1107_event_group;
@@ -102,6 +106,16 @@ static void export_val_deinit()
   free(export_hdl);
 }
 
+static void iec1107_timer_cb(TimerHandle_t xTimer)
+{
+  ESP_LOGI(IEC1107_TAG, "Reading EM Starting Again..");
+
+  /* Stop the timer */
+  xTimerStop(xTimer, (TickType_t) 0);
+
+  /*Attempt to send start message */
+  xEventGroupSetBits(s_iec1107_event_group, START_MESSAGE_SEND);
+}
 
 static void iec1107_management_task(void* pvParameters)
 {
@@ -196,6 +210,7 @@ static void export_line(esp_event_loop_handle_t hdl, const uint8_t* buffer)
     esp_event_post_to(hdl, IEC1107_EVENT, IEC1107_FIELDS_UPDATED, NULL, 0, 100 / portTICK_PERIOD_MS);
     xEventGroupClearBits(s_iec1107_event_group, READOUT_MESSAGE_SENDED);
     xEventGroupSetBits(s_iec1107_event_group, READOUT_MESSAGE_ENDED);
+    xTimerStart( iec1107_cycle_timer, (TickType_t)0 );
     return; // Don't remove return exp for this statement.
   }
 
@@ -343,6 +358,9 @@ iec1107_parser_handle_t iec1107_parser_init(reading_mode_t mode, uint16_t timeou
 
   iec1107 -> read_mode = mode;
   iec1107 -> timeout = timeout;
+
+  iec1107_cycle_timer =  xTimerCreate( NULL, pdMS_TO_TICKS(iec1107 -> timeout), pdFALSE, ( void * ) 0, iec1107_timer_cb);
+
 
   iec1107 -> buffer = calloc(1, IEC1107_PARSER_RUNTIME_BUFFER_SIZE);
   if (!iec1107 -> buffer)

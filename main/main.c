@@ -52,7 +52,7 @@ static void iec1107_event_handler(void* event_handler_arg, esp_event_base_t even
 
 void app_main()
 {
-  iec1107_parser_handle_t iec1107 = iec1107_parser_init(LOOP, 1000);
+  iec1107_parser_handle_t iec1107 = iec1107_parser_init(LOOP, 10000);
 
   iec1107_parser_add_handler(iec1107, iec1107_event_handler, NULL);
 
