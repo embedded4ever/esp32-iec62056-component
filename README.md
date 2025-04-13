@@ -1,3 +1,5 @@
+<a href="https://buymeacoffee.com/vvolkanunas" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+
 # What is esp32-iec62056-component
 
 esp32-iec62056-component is a pure C esp-idf component for ESP32 that allows reading electricity meters with optical eye.
