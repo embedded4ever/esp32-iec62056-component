@@ -86,7 +86,7 @@ void app_main()
 
 ## Adding obis code
 
-You can edit `export_obis_code` [config.h](components/iec1107/include/config.h)
+You can edit and add `export_obis_code` [config.h](components/iec1107/include/config.h)
 Example : 
 ```
 const char* export_obis_code[] =
